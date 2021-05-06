@@ -201,7 +201,7 @@ const RPSGame = {
     console.log(`You need to win ${this.rules.gamesToWin - this.score.human} more to win the match.`);
   },
 
-  updateScore() {
+  updateGameWinner() {
     let humanMove = this.human.move;
     let computerMove = this.computer.move;
     let movesDefeatedBy = this.rules.movesDefeatedBy;
@@ -214,11 +214,18 @@ const RPSGame = {
     } else {
       this.setGameWinner('tie');
     }
+  },
 
+  updateScore() {
     this.score.incrementScore(this.winner); // increase score of winner by 1
-    this.score.updateGameHistory(humanMove, computerMove, this.winner);  // track moves
+    this.score.updateGameHistory(
+      this.human.move,
+      this.computer.move,
+      this.winner
+    );  // track moves
+  },
 
-
+  updateMatchWinner() {
     // check for match winner
     if (this.score.human === this.rules.gamesToWin) {
       this.setMatchWinner('human');
@@ -227,7 +234,7 @@ const RPSGame = {
     }
   },
 
-  displayWinner() {
+  displayGameWinner() {
     let humanMove = this.human.move;
     let computerMove = this.computer.move;
 
@@ -276,6 +283,11 @@ const RPSGame = {
   playAgain(gameOrMatch) {
     console.log(`\nWould you like to play a new ${gameOrMatch}? (y/n)`);
     let answer = readline.question().trim().toLowerCase()[0];
+    while (true) {
+      if ('yn'.includes(answer)) break;
+      console.log('Please respond with y or n');
+      answer = readline.question().trim().toLowerCase()[0];
+    }
     return answer === 'y';
   },
 
@@ -291,12 +303,13 @@ const RPSGame = {
         this.human.choose(this.rules);
         this.computer.choose(this.rules.validChoices, this.score.gameHistory);
 
+        this.updateGameWinner();
         this.updateScore();
-        this.displayWinner();
+        this.updateMatchWinner();
+        this.displayGameWinner();
 
-        if (this.matchWinner) break;
+        if (this.matchWinner || !this.playAgain('game')) break;
 
-        if (!this.playAgain('game')) break;
         console.clear();
       }
 
