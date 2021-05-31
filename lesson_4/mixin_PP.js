@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // Practice Problems
 // If we have a Car class and a Truck class, how can you use
 // the Speed object as a mix-in to make them goFast? How can
