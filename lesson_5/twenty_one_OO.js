@@ -16,7 +16,6 @@ class Card {
   }
 
   getValue() {
-    // something to test Ace Value--or maybe this is in game class
     return this.value;
   }
 
@@ -28,9 +27,6 @@ class Card {
     this.value = Card.LOW_ACE_VALUE;
   }
 
-  // toString() {
-  //   console.log(`${this.title} has a value of ${this.value}`);
-  // }
 }
 
 class Deck {
@@ -57,20 +53,20 @@ class Deck {
       });
     });
 
-    this.cards = this.shuffle(this.cards);
+    this.shuffle();
   }
 
   dealCard() {
     return this.cards.pop();
   }
 
-  shuffle(cards) {
-    for (let indexOne = cards.length - 1; indexOne > 0; indexOne--) {
-      const indexTwo = Math.floor(Math.random() * (indexOne + 1));
-      [cards[indexOne], cards[indexTwo]] = [cards[indexTwo], cards[indexOne]];
-    }
+  shuffle() {
+    let cards = this.cards;
 
-    return cards;
+    for (let index = cards.length - 1; index > 0; index--) {
+      const randomIndex = Math.floor(Math.random() * (index + 1));
+      [cards[index], cards[randomIndex]] = [cards[randomIndex], cards[index]];
+    }
   }
 }
 
@@ -97,7 +93,7 @@ class Participant {
 
     let highAce = this.getHighAce();
 
-    if (sum > Participant.BUST_NUMBER && highAce) {
+    if (highAce && (sum > Participant.BUST_NUMBER)) {
       highAce.convertToLowAce();
       sum = this.getHandSum();
     }
@@ -204,7 +200,7 @@ class TwentyOneGame {
 
     while (true) {
       this.playOneGame();
-      this.claimWinnings(this.getWinner());
+      this.claimWinnings();
       this.player.logWinnings();
 
       if (this.player.isBroke() || this.player.isRich()) break;
@@ -296,16 +292,16 @@ class TwentyOneGame {
 
       } else {
         this.dealer.logMove("stays");
-        this.readyFor("results");
+        this.userReadyFor("results");
         break;
       }
 
       if (this.dealer.isBusted()) break;
-      this.readyFor("the next move");
+      this.userReadyFor("the next move");
     }
   }
 
-  readyFor(nextStep) {
+  userReadyFor(nextStep) {
     let seeNextStep = READLINE.question(`Press enter to see ${nextStep}:`);
 
     return seeNextStep;
@@ -321,7 +317,7 @@ class TwentyOneGame {
       console.log("Not a valid response. Try again.");
     }
 
-    return choice;
+    return choice.toLowerCase();
   }
 
   getWinner() {
@@ -350,7 +346,8 @@ class TwentyOneGame {
     return this.dealer.getHandSum() < Dealer.HIT_THRESHOLD;
   }
 
-  claimWinnings(winner) {
+  claimWinnings() {
+    let winner = this.getWinner();
     if (this.player === winner) {
       this.player.addToWinnings();
     } else if (this.dealer === winner) {
@@ -386,7 +383,7 @@ class TwentyOneGame {
       console.log("Not a valid response. Try again.");
     }
 
-    return choice === "y";
+    return choice.toLowerCase() === "y";
   }
 
   displayGoodbyeMessage() {
